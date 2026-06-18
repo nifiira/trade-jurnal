@@ -137,13 +137,12 @@
     }
 
    function ambilKursLive() {
-        // Menggunakan API publik Binance untuk pasangan USDT/IDRT
-        fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDTIDRT')
+        // Menggunakan API CoinGecko (Tidak diblokir di Indonesia, Real-time, Tanpa API Key)
+        fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=idr')
             .then(response => response.json())
             .then(data => {
-                // Binance mengirim data dalam bentuk string, jadi kita ubah ke float
-                kursUSD = parseFloat(data.price); 
-                document.getElementById("kurs-info").innerText = `Kurs Live (Real-time USDT): 1 USD = ${formatIDR(kursUSD)}`;
+                kursUSD = data.tether.idr; 
+                document.getElementById("kurs-info").innerText = `Kurs Live (USDT/IDR): 1 USD = ${formatIDR(kursUSD)}`;
                 perbaruiTampilan(globalSnapshotData);
             })
             .catch(error => {
