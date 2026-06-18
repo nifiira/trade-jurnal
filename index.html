@@ -108,37 +108,34 @@
 </div>
 
 <script type="module">
-   // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    // 1. IMPORT FUNGSI FIREBASE (Gunakan versi 10.12.2 yang valid)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    // 2. WAJIB IMPORT DATABASE (Ini yang sebelumnya terlewat)
+    import { getDatabase, ref, onValue, push, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCtaQYP-t7By2XkNJKZ3-4kw8Lgyo0Qjo8",
-    authDomain: "jurnal-trade-66ecb.firebaseapp.com",
-    databaseURL: "https://jurnal-trade-66ecb-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "jurnal-trade-66ecb",
-    storageBucket: "jurnal-trade-66ecb.firebasestorage.app",
-    messagingSenderId: "785778754765",
-    appId: "1:785778754765:web:bfefd4f76e6f8e9ae85584",
-    measurementId: "G-RBZSTHBXFY"
-  };
+    const firebaseConfig = {
+        apiKey: "AIzaSyCtaQYP-t7By2XkNJKZ3-4kw8Lgyo0Qjo8",
+        authDomain: "jurnal-trade-66ecb.firebaseapp.com",
+        databaseURL: "https://jurnal-trade-66ecb-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jurnal-trade-66ecb",
+        storageBucket: "jurnal-trade-66ecb.firebasestorage.app",
+        messagingSenderId: "785778754765",
+        appId: "1:785778754765:web:bfefd4f76e6f8e9ae85584",
+        measurementId: "G-RBZSTHBXFY"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+    // Inisialisasi Firebase & Tentukan Referensi Database
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app); // Menghubungkan ke database
+    const dbRef = ref(db, "jurnal_trading"); // Membuat folder/tabel "jurnal_trading"
 
     const modalAwalCents = 1270.00; 
-    let kursUSD = 16200; // Kurs fallback jika API bermasalah
+    let kursUSD = 16200; 
 
     function formatIDR(angka) {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
     }
 
-    // Fungsi fetch Kurs Live
     function ambilKursLive() {
         fetch('https://open.er-api.com/v6/latest/USD')
             .then(response => response.json())
@@ -148,14 +145,14 @@
                 perbaruiTampilan(globalSnapshotData);
             })
             .catch(error => {
-                console.error("Gagal mengambil data kurs live:", error);
+                console.error("Gagal ambil kurs:", error);
                 document.getElementById("kurs-info").innerText = `Gagal memuat kurs live. Menggunakan kurs standar: 1 USD = ${formatIDR(kursUSD)}`;
             });
     }
 
     let globalSnapshotData = null;
 
-    // Mendengarkan data dari Firebase secara realtime
+    // Menarik data dari Firebase secara realtime
     onValue(dbRef, (snapshot) => {
         globalSnapshotData = snapshot.val();
         perbaruiTampilan(globalSnapshotData);
@@ -213,7 +210,7 @@
         document.getElementById("displaySaldoIDR").innerText = formatIDR((saldoAkhirCents / 100) * kursUSD);
     }
 
-    // Aksi Simpan
+    // Fungsi Simpan dengan Notifikasi
     document.getElementById("btnSimpan").addEventListener("click", () => {
         let tanggal = document.getElementById("tanggal").value;
         let pair = document.getElementById("pair").value;
@@ -227,22 +224,28 @@
             return;
         }
 
-        // Menyimpan data ke Firebase
-        push(dbRef, { tanggal, pair, posisi, lot, plCents, catatan });
-        
-        document.getElementById("pair").value = "";
-        document.getElementById("plCents").value = "";
-        document.getElementById("catatan").value = "";
+        // Menyimpan data ke Firebase dan memunculkan notifikasi
+        push(dbRef, { tanggal, pair, posisi, lot, plCents, catatan })
+            .then(() => {
+                alert("✅ Transaksi berhasil disimpan!");
+                
+                // Kosongkan form setelah berhasil
+                document.getElementById("pair").value = "";
+                document.getElementById("plCents").value = "";
+                document.getElementById("catatan").value = "";
+            })
+            .catch((error) => {
+                alert("❌ Gagal menyimpan: " + error.message);
+                console.error("Error Firebase:", error);
+            });
     });
 
-    // Aksi Hapus per Baris
     window.hapusTransaksi = function(key) {
         if(confirm("Hapus transaksi ini?")) {
             remove(ref(db, `jurnal_trading/${key}`));
         }
     }
 
-    // Aksi Reset Total
     document.getElementById("btnReset").addEventListener("click", () => {
         if(confirm("Hapus seluruh riwayat di cloud secara permanen?")) {
             set(dbRef, null);
