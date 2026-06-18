@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jurnal Trading - Akun Cent Cloud</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f6;
+        color: #333;
+        padding: 20px;
+      }
+      h1,
+      h3 {
+        text-align: center;
+        color: #2c3e50;
+      }
+      .container {
+        max-width: 1100px;
+        margin: auto;
+      }
+      .card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .grid-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+      label {
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #34495e;
+      }
+      input,
+      select,
+      button {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+      button {
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+        width: 100%;
+        transition: 0.3s;
+      }
+      button:hover {
+        background-color: #219150;
+      }
+      .btn-danger {
+        background-color: #e74c3c;
+        width: auto;
+        padding: 5px 10px;
+      }
+      .btn-danger:hover {
+        background-color: #c0392b;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 14px;
+      }
+      th,
+      td {
+        border: 1px solid #ecf0f1;
+        padding: 12px;
+        text-align: center;
+      }
+      th {
+        background-color: #34495e;
+        color: white;
+      }
+      .profit {
+        color: #27ae60;
+        font-weight: bold;
+      }
+      .loss {
+        color: #e74c3c;
+        font-weight: bold;
+      }
+      .neutral {
+        color: #7f8c8d;
+        font-weight: bold;
+      }
+      .summary {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #e8f8f5;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 16px;
+        border-bottom: 1px dashed #bdc3c7;
+        padding-bottom: 10px;
+      }
+      .summary-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        font-size: 18px;
+      }
+      #kurs-info {
+        text-align: center;
+        font-size: 12px;
+        color: #7f8c8d;
+        margin-top: -15px;
+        margin-bottom: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📊 Jurnal Trading Cloud (Akun Cent)</h1>
+      <div id="kurs-info">Memuat data kurs live...</div>
+
+      <div class="summary">
+        <div class="summary-row">
+          <span style="color: #34495e">Modal Awal:</span>
+          <span
+            ><span id="displayModalCents">0.00</span> USC &nbsp;|&nbsp; $<span
+              id="displayModalUSD"
+              >0.000</span
+            >
+            &nbsp;|&nbsp; <span id="displayModalIDR">Rp 0</span></span
+          >
+        </div>
+        <div class="summary-row">
+          <span style="color: #2980b9">Total P/L Bersih (Profit - Loss):</span>
+          <span id="containerNetPL"
+            ><span id="displayNetCents">0.00</span> USC &nbsp;|&nbsp; $<span
+              id="displayNetUSD"
+              >0.000</span
+            >
+            &nbsp;|&nbsp; <span id="displayNetIDR">Rp 0</span></span
+          >
+        </div>
+        <div class="summary-row" style="color: #2c3e50">
+          <span>Saldo Akhir:</span>
+          <span
+            ><span id="displaySaldoCents">0.00</span> USC &nbsp;|&nbsp; $<span
+              id="displaySaldoUSD"
+              >0.000</span
+            >
+            &nbsp;|&nbsp; <span id="displaySaldoIDR">Rp 0</span></span
+          >
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Input Transaksi Baru</h3>
+        <div class="grid-form">
+          <div class="form-group">
+            <label>Tanggal</label>
+            <input type="date" id="tanggal" required />
+          </div>
+          <div class="form-group">
+            <label>Pair / Aset</label>
+            <input
+              type="text"
+              id="pair"
+              placeholder="Contoh: XAUUSD"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Posisi</label>
+            <select id="posisi">
+              <option value="Buy">Buy</option>
+              <option value="Sell">Sell</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Lot</label>
+            <input
+              type="number"
+              step="0.01"
+              id="lot"
+              placeholder="0.01"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Profit/Loss (Cents)</label>
+            <input
+              type="number"
+              step="0.01"
+              id="plCents"
+              placeholder="Contoh: 1.60 atau -2.50"
+              required
+            />
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1">
+            <label>Catatan / Evaluasi</label>
+            <input
+              type="text"
+              id="catatan"
+              placeholder="Alasan entry atau evaluasi trade ini..."
+            />
+          </div>
+        </div>
+        <button id="btnSimpan">Simpan Transaksi</button>
+        <button
+          id="btnReset"
+          class="btn-danger"
+          style="margin-top: 15px; background-color: #95a5a6"
+        >
+          Reset Semua Data
+        </button>
+      </div>
+
+      <div class="card" style="overflow-x: auto">
+        <h3>Riwayat Transaksi</h3>
+        <table id="tabelJurnal">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Pair</th>
+              <th>Lot</th>
+              <th>Posisi</th>
+              <th>P/L (Cents)</th>
+              <th>P/L (USD)</th>
+              <th>P/L (IDR)</th>
+              <th>Catatan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyCtaQYP-t7By2XkNJKZ3-4kw8Lgyo0Qjo8",
+        authDomain: "jurnal-trade-66ecb.firebaseapp.com",
+        projectId: "jurnal-trade-66ecb",
+        storageBucket: "jurnal-trade-66ecb.firebasestorage.app",
+        messagingSenderId: "785778754765",
+        appId: "1:785778754765:web:bfefd4f76e6f8e9ae85584",
+        measurementId: "G-RBZSTHBXFY",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
+  </body>
+</html>
