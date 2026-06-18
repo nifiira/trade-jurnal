@@ -136,16 +136,18 @@
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
     }
 
-    function ambilKursLive() {
-        fetch('https://open.er-api.com/v6/latest/USD')
+   function ambilKursLive() {
+        // Menggunakan API publik Binance untuk pasangan USDT/IDRT
+        fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDTIDRT')
             .then(response => response.json())
             .then(data => {
-                kursUSD = data.rates.IDR;
-                document.getElementById("kurs-info").innerText = `Kurs Live Terkini: 1 USD = ${formatIDR(kursUSD)}`;
+                // Binance mengirim data dalam bentuk string, jadi kita ubah ke float
+                kursUSD = parseFloat(data.price); 
+                document.getElementById("kurs-info").innerText = `Kurs Live (Real-time USDT): 1 USD = ${formatIDR(kursUSD)}`;
                 perbaruiTampilan(globalSnapshotData);
             })
             .catch(error => {
-                console.error("Gagal ambil kurs:", error);
+                console.error("Gagal mengambil data kurs live:", error);
                 document.getElementById("kurs-info").innerText = `Gagal memuat kurs live. Menggunakan kurs standar: 1 USD = ${formatIDR(kursUSD)}`;
             });
     }
