@@ -108,7 +108,7 @@
 </div>
 
 <script type="module">
-    // Import the functions you need from the SDKs you need
+   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
   // TODO: Add SDKs for Firebase products that you want to use
@@ -125,10 +125,10 @@
     appId: "1:785778754765:web:bfefd4f76e6f8e9ae85584",
     measurementId: "G-RBZSTHBXFY"
   };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, "jurnal_trading");
 
     const modalAwalCents = 1270.00; 
     let kursUSD = 16200; // Kurs fallback jika API bermasalah
